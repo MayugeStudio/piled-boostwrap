@@ -1,4 +1,8 @@
-default_iota = 1
+from typing import TypeAlias
+
+EnumType: TypeAlias = int
+
+default_iota: EnumType = 1
 iota = default_iota
 
 
