@@ -13,7 +13,7 @@ class Word:
     location: Location
     value: str
 
-class TokenKind(Enum):
+class TokenType(Enum):
     WORD = auto()
     PLUS = auto()
     MINUS = auto()
@@ -24,9 +24,9 @@ class TokenKind(Enum):
 class Token:
     filepath: str
     location: Location
-    kind: TokenKind
+    type: TokenType
     value: tt.Optional[int] = None
 
 
-class ErrorKind(Enum):
+class ErrorType(Enum):
     UnknownValue = "UnknownValueError"

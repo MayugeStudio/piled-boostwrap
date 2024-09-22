@@ -1,18 +1,18 @@
-from piled.common import Word, TokenKind, Token, ErrorKind
+from piled.common import Word, TokenType, Token, ErrorType
 
-assert len(TokenKind) == 4, "Exhaustive handling of TokenKind"
-token_literal_bindings: dict[str, TokenKind] = {
-    '+': TokenKind.PLUS,
-    '-': TokenKind.MINUS,
-    'print': TokenKind.PRINT,
+assert len(TokenType) == 4, "Exhaustive handling of TokenKind"
+token_literal_bindings: dict[str, TokenType] = {
+    '+': TokenType.PLUS,
+    '-': TokenType.MINUS,
+    'print': TokenType.PRINT,
 }
 
 
-def parser_report_error(word: Word, kind: ErrorKind, message: str, with_exit=True) -> None:
+def parser_report_error(word: Word, err_type: ErrorType, message: str, with_exit=True) -> None:
     print("%s:%d:%d: %s: %s" %
           (word.filepath,
            word.location.row, word.location.col,
-           str(kind.value), message))
+           str(err_type.value), message))
     if with_exit:
         exit(1)
 
@@ -23,6 +23,6 @@ def parse_word_as_token(word: Word) -> Token:
     else:
         try:
             value = int(word.value)
-            return Token(word.filepath, word.location, TokenKind.WORD, value=value)
+            return Token(word.filepath, word.location, TokenType.WORD, value=value)
         except ValueError:
-            parser_report_error(word, ErrorKind.UnknownValue, "unknown value `%s`" % (word.value,))
+            parser_report_error(word, ErrorType.UnknownValue, "unknown value `%s`" % (word.value,))
