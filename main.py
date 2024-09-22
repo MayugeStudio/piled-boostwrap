@@ -61,6 +61,8 @@ def main() -> None:
 
     if out_filename is None:
         out_filename = base_name + ".out"
+    else:
+        base_name = out_filename
 
     print("[INFO] Generating %s" % (base_name + ".asm"))
     generate_assembly(base_name + ".asm", [parse_word_as_token(word) for word in lex_file(in_filename)])
