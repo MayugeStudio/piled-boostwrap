@@ -9,10 +9,10 @@ from piled import lex_file
 from piled import parse_word_as_token
 
 
-def call_cmd(args: list[str], echo=True) -> None:
+def call_cmd(args: list[str], echo=True, capture=True) -> None:
     if echo:
         print("[CMD] " + " ".join(args))
-    subprocess.run(args, capture_output=True)
+    subprocess.run(args, capture_output=capture)
 
 
 def usage(program_name: str) -> None:
@@ -35,6 +35,7 @@ def main() -> None:
 
     out_filename = "output.out"
     in_filename = None
+    with_run = False
 
     while len(argv) > 0:
         arg, *argv = argv
@@ -45,6 +46,8 @@ def main() -> None:
             if len(argv) <= 0:
                 error("not enough argument for `-o`")
             out_filename, *argv = argv
+        elif arg == "-r":
+            with_run = True
         else:
             in_filename = arg
 
@@ -56,7 +59,11 @@ def main() -> None:
         list([build_IR_from_token(parse_word_as_token(word)) for word in lex_file("tests/test.piled")])
     )
     call_cmd(["fasm", "output.asm"])
+    call_cmd(["rm", "output.asm"], echo=False)
     call_cmd(["mv", "output", out_filename], echo=False)
+
+    if with_run:
+        call_cmd(["./" + out_filename], capture=False)
 
 
 if __name__ == "__main__":
