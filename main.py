@@ -2,6 +2,7 @@
 
 import subprocess
 import sys
+import os
 
 from piled import generate_assembly
 from piled import lex_file
@@ -32,8 +33,8 @@ def main() -> None:
         usage(program_name)
         sys.exit(1)
 
-    out_filename = "output.out"
     in_filename = None
+    out_filename = None
     with_run = False
 
     while len(argv) > 0:
@@ -53,9 +54,18 @@ def main() -> None:
     if in_filename is None:
         error("input-filename is not specified")
 
-    generate_assembly("output.asm", [parse_word_as_token(word) for word in lex_file("tests/test.piled")])
-    call_cmd(["fasm", "output.asm"])
-    call_cmd(["mv", "output", out_filename], echo=False)
+    piled_ext = ".piled"
+    base_name = os.path.basename(in_filename)
+    if base_name.endswith(piled_ext):
+        base_name = base_name[:-len(piled_ext)]
+
+    if out_filename is None:
+        out_filename = base_name + ".out"
+
+    print("[INFO] Generating %s" % (base_name + ".asm"))
+    generate_assembly(base_name + ".asm", [parse_word_as_token(word) for word in lex_file(in_filename)])
+    call_cmd(["fasm", base_name + ".asm"])
+    call_cmd(["mv", base_name, out_filename], echo=False)
 
     if with_run:
         call_cmd(["./" + out_filename], capture=False)
