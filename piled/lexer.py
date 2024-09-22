@@ -10,11 +10,11 @@ def find_col(line: str, start: int, stop: tt.Callable[[str], bool]) -> int:
 
 
 def lex_line(line: str) -> tt.Generator[tuple[int, str], None, None]:
-    col = find_col(line, 0, lambda x: x.isascii())
+    col = find_col(line, 0, lambda x: not x.isspace())
     while col < len(line):
-        col_end = find_col(line, col+1, lambda x: x.isspace())
+        col_end = find_col(line, col, lambda x: x.isspace())
         yield col, line[col:col_end]
-        col = find_col(line, col_end, lambda x: x.isspace())
+        col = find_col(line, col_end, lambda x: not x.isspace())
 
 
 def lex_file(file_path: str) -> list[Word]:
