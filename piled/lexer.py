@@ -1,5 +1,7 @@
 import typing as tt
 
+from piled.common import Word, Location
+
 def find_col(line: str, start: int, stop: tt.Callable[[str], bool]) -> int:
     col = start
     while col < len(line) and not stop(line[col]):
@@ -15,8 +17,8 @@ def lex_line(line: str) -> tt.Generator[tuple[int, str], None, None]:
         col = find_col(line, col_end, lambda x: x.isspace())
 
 
-def lex_file(file_path: str) -> list[tuple[str, int, int, str]]:
+def lex_file(file_path: str) -> list[Word]:
     with open(file_path) as f:
-        return [(file_path, row, col, word)
+        return [Word(file_path, Location(row, col), word)
                 for (row, line) in enumerate(f.readlines())
                 for (col, word) in lex_line(line)]
