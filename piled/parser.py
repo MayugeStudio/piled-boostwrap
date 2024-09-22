@@ -2,8 +2,8 @@ from piled.common import ErrorType, Token, TokenType, Word
 
 assert len(TokenType) == 4, "Exhaustive handling of TokenKind"
 token_literal_bindings: dict[str, TokenType] = {
-    "+": TokenType.PLUS,
-    "-": TokenType.MINUS,
+    "+"    : TokenType.PLUS,
+    "-"    : TokenType.MINUS,
     "print": TokenType.PRINT,
 }
 
