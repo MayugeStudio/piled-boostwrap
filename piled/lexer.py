@@ -1,11 +1,22 @@
-from enum_helper import enum
+import typing as tt
 
-TOKEN_INT = enum(reset=True)
-TOKEN_PLUS = enum()
-TOKEN_MINUS = enum()
-TOKEN_TOTAL_COUNT = enum()
+def find_col(line: str, start: int, stop: tt.Callable[[str], bool]) -> int:
+    col = start
+    while col < len(line) and not stop(line[col]):
+        col += 1
+    return col
 
-token_literal_bindings = {
-    '+': TOKEN_PLUS,
-    '-': TOKEN_MINUS,
-}
+
+def lex_line(line: str) -> tt.Generator[tuple[int, str], None, None]:
+    col = find_col(line, 0, lambda x: x.isascii())
+    while col < len(line):
+        col_end = find_col(line, col+1, lambda x: x.isspace())
+        yield col, line[col:col_end]
+        col = find_col(line, col_end, lambda x: x.isspace())
+
+
+def lex_file(file_path: str) -> list[tuple[str, int, int, str]]:
+    with open(file_path) as f:
+        return [(file_path, row, col, word)
+                for (row, line) in enumerate(f.readlines())
+                for (col, word) in lex_line(line)]
