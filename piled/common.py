@@ -17,9 +17,10 @@ class Word:
 
 
 class TokenType(Enum):
-    WORD = auto()
+    PUSH_INT = auto()
     PLUS = auto()
     MINUS = auto()
+    EQUAL = auto()
     PRINT = auto()
 
 

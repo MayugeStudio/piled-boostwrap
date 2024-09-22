@@ -1,9 +1,10 @@
 from piled.common import ErrorType, Token, TokenType, Word
 
-assert len(TokenType) == 4, "Exhaustive handling of TokenKind"
+assert len(TokenType) == 5, "Exhaustive handling of TokenKind"
 token_literal_bindings: dict[str, TokenType] = {
     "+"    : TokenType.PLUS,
     "-"    : TokenType.MINUS,
+    "="    : TokenType.EQUAL,
     "print": TokenType.PRINT,
 }
 
@@ -20,6 +21,6 @@ def parse_word_as_token(word: Word) -> Token:
     else:
         try:
             value = int(word.value)
-            return Token(word.filepath, word.location, TokenType.WORD, value=value)
+            return Token(word.filepath, word.location, TokenType.PUSH_INT, value=value)
         except ValueError:
             parser_report_error(word, ErrorType.UnknownValue, "unknown value `%s`" % (word.value,))

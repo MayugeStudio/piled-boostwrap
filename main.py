@@ -3,7 +3,6 @@
 import subprocess
 import sys
 
-from piled import build_IR_from_token
 from piled import generate_assembly
 from piled import lex_file
 from piled import parse_word_as_token
@@ -54,12 +53,8 @@ def main() -> None:
     if in_filename is None:
         error("input-filename is not specified")
 
-    generate_assembly(
-        "output.asm",
-        list([build_IR_from_token(parse_word_as_token(word)) for word in lex_file("tests/test.piled")])
-    )
+    generate_assembly("output.asm", [parse_word_as_token(word) for word in lex_file("tests/test.piled")])
     call_cmd(["fasm", "output.asm"])
-    call_cmd(["rm", "output.asm"], echo=False)
     call_cmd(["mv", "output", out_filename], echo=False)
 
     if with_run:

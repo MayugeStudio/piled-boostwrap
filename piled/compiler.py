@@ -1,7 +1,6 @@
 from io import StringIO
 
-from piled.ir_builder import IR, IRType
-
+from piled.common import Token, TokenType
 
 class AsmWriter(StringIO):
     def write(self, s: str) -> int:
@@ -20,9 +19,9 @@ class AsmWriter(StringIO):
         self.write("    " + s)
 
 
-def generate_assembly(filepath: str, irs: list[IR]) -> None:
+def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     ip = 0
-    irs_count = len(irs)
+    tokens_count = len(tokens)
     buf = AsmWriter()
 
     # Write Header
@@ -61,21 +60,30 @@ def generate_assembly(filepath: str, irs: list[IR]) -> None:
     buf.body("")
     buf.config("entry _start")
     buf.label("_start")
-    while ip < irs_count:
-        ir = irs[ip]
-        if ir.type == IRType.PUSH_INT:
-            buf.body("push %d" % (ir.value,))
-        elif ir.type == IRType.PLUS:
+    assert len(TokenType) == 5, "Exhaustive handling of TokenType in compilation"
+    while ip < tokens_count:
+        token = tokens[ip]
+        if token.type == TokenType.PUSH_INT:
+            buf.body("push %d" % (token.value,))
+        elif token.type == TokenType.PLUS:
             buf.body("pop rax")
             buf.body("pop rbx")
             buf.body("add rax, rbx")
             buf.body("push rax")
-        elif ir.type == IRType.MINUS:
+        elif token.type == TokenType.MINUS:
             buf.body("pop rax")
             buf.body("pop rbx")
             buf.body("sub rbx, rax")
             buf.body("push rbx")
-        elif ir.type == IRType.PRINT:
+        elif token.type == TokenType.EQUAL:
+            buf.body("mov rcx, 0")
+            buf.body("mov rdx, 1")
+            buf.body("pop rax")
+            buf.body("pop rbx")
+            buf.body("cmp rax, rbx")
+            buf.body("cmove rcx, rdx")
+            buf.body("push rcx")
+        elif token.type == TokenType.PRINT:
             buf.body("pop rdi")
             buf.body("call print")
         else:
