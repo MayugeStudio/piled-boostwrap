@@ -1,18 +1,15 @@
-from piled.common import Word, TokenType, Token, ErrorType
+from piled.common import ErrorType, Token, TokenType, Word
 
 assert len(TokenType) == 4, "Exhaustive handling of TokenKind"
 token_literal_bindings: dict[str, TokenType] = {
-    '+': TokenType.PLUS,
-    '-': TokenType.MINUS,
-    'print': TokenType.PRINT,
+    "+": TokenType.PLUS,
+    "-": TokenType.MINUS,
+    "print": TokenType.PRINT,
 }
 
 
 def parser_report_error(word: Word, err_type: ErrorType, message: str, with_exit=True) -> None:
-    print("%s:%d:%d: %s: %s" %
-          (word.filepath,
-           word.location.row, word.location.col,
-           str(err_type.value), message))
+    print("%s:%d:%d: %s: %s" % (word.filepath, word.location.row, word.location.col, str(err_type.value), message))
     if with_exit:
         exit(1)
 

@@ -1,10 +1,8 @@
 import typing as tt
 from dataclasses import dataclass
-from enum import Enum
-from enum import auto
+from enum import Enum, auto
 
-from piled.common import Token
-from piled.common import TokenType
+from piled.common import Token, TokenType
 
 
 class IRType(Enum):
