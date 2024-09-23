@@ -17,7 +17,7 @@ class AsmWriter(StringIO):
 
     def label(self, label_name: str, label_comment: tt.Optional[str] = None) -> None:
         if label_comment is not None:
-            self.write("\n; ######## " + label_name + " ########")
+            self.write("\n; ######## " + label_comment + " ########")
             self.write(label_name + ":")
         else:
             self.write("\n" + label_name + ":")
@@ -67,7 +67,7 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     buf.body("")
     buf.config("entry _start")
     buf.label("_start")
-    assert len(TokenType) == 8, "Exhaustive handling of TokenType in compilation"
+    assert len(TokenType) == 9, "Exhaustive handling of TokenType in compilation"
     while ip < tokens_count:
         token = tokens[ip]
         if token.type == TokenType.PUSH_INT:
@@ -102,9 +102,13 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("; #### then ####")
             buf.body("pop rax")
             buf.body("test rax, rax")
-            buf.body("jz _label_end_%d" % token.value)
+            buf.body("jz _label_%d" % token.value)
+        elif token.type == TokenType.ELSE:
+            assert token.value is not None, "please call cross_references() before calling generate_assembly()"
+            buf.body("jmp _label_%d" % token.value)
+            buf.label("_label_%d" % (ip + 1,), label_comment="else")
         elif token.type == TokenType.END:
-            buf.label("_label_end_%d" % ip, label_comment="end")
+            buf.label("_label_%d" % ip, label_comment="end")
         elif token.type == TokenType.PRINT:
             buf.body("; #### print ####")
             buf.body("pop rdi")

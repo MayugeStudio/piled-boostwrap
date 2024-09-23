@@ -24,6 +24,7 @@ class TokenType(Enum):
     EQUAL = auto()
     IF = auto()
     THEN = auto()
+    ELSE = auto()
     END = auto()
     PRINT = auto()
 
