@@ -22,6 +22,7 @@ class TokenType(Enum):
     MINUS = auto()
     EQUAL = auto()
     IF = auto()
+    THEN = auto()
     ENDIF = auto()
     PRINT = auto()
 

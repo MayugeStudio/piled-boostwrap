@@ -3,12 +3,13 @@ from piled.common import Token
 from piled.common import TokenType
 from piled.common import Word
 
-assert len(TokenType) == 7, "Exhaustive handling of TokenKind"
+assert len(TokenType) == 8, "Exhaustive handling of TokenKind"
 token_literal_bindings: dict[str, TokenType] = {
     "+"    : TokenType.PLUS,
     "-"    : TokenType.MINUS,
     "="    : TokenType.EQUAL,
     "if"   : TokenType.IF,
+    "then" : TokenType.THEN,
     "endif": TokenType.ENDIF,
     "print": TokenType.PRINT,
 }
@@ -33,20 +34,22 @@ def parse_word_as_token(word: Word) -> Token:
 
 def cross_references(program: list[Token]) -> list[Token]:
     addr = 0
-    stack = []
+    stack: list[int] = []
     program_length = len(program)
-    assert len(TokenType) == 7, \
-        "Exhaustive handling of TokenType in cross_reference. \
-         Note that not all of tokens need to be handled in here.\
+    assert len(TokenType) == 8, \
+        "Exhaustive handling of TokenType in cross_reference. \n \
+         Note that not all of tokens need to be handled in here.\n \
          Only those that form blocks."
     while addr < program_length:
         if program[addr].type == TokenType.IF:
+            pass
+        elif program[addr].type == TokenType.THEN:
             stack.append(addr)
         elif program[addr].type == TokenType.ENDIF:
-            if_addr = stack.pop()
-            assert program[if_addr].type == TokenType.IF, \
-                "The token `endif` can only close `if` block. but other are found."
-            program[if_addr].value = addr
+            then_addr = stack.pop()
+            assert program[then_addr].type == TokenType.THEN, \
+                "The token `endif` can only close `if` block. but %s is found." % program[then_addr].type.name
+            program[then_addr].value = addr
 
         addr += 1
 
