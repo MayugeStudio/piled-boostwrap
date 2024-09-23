@@ -29,7 +29,7 @@ def parse_word_as_token(word: Word) -> Token:
             value = int(word.value)
             return Token(word.filepath, word.location, TokenType.PUSH_INT, value=value)
         except ValueError:
-            parser_report_error(word, ErrorType.UnknownValue, "unknown value `%s`" % (word.value,))
+            parser_report_error(word, ErrorType.UnknownTokenError, "unknown value `%s`" % (word.value,))
 
 
 def cross_references(program: list[Token]) -> list[Token]:

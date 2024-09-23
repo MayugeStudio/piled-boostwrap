@@ -36,4 +36,4 @@ class Token:
 
 
 class ErrorType(Enum):
-    UnknownValue = "UnknownValueError"
+    UnknownTokenError = "UnknownTokenError"
