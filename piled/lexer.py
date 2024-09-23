@@ -1,6 +1,7 @@
 import typing as tt
 
-from piled.common import Location, Word
+from piled.common import Location
+from piled.common import Word
 
 
 def find_col(line: str, start: int, stop: tt.Callable[[str], bool]) -> int:
