@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
+import os
 import subprocess
 import sys
-import os
 
+from piled import cross_references
 from piled import generate_assembly
 from piled import lex_file
 from piled import parse_word_as_token
@@ -65,7 +66,10 @@ def main() -> None:
         base_name = out_filename
 
     print("[INFO] Generating %s" % (base_name + ".asm"))
-    generate_assembly(base_name + ".asm", [parse_word_as_token(word) for word in lex_file(in_filename)])
+    generate_assembly(
+        base_name + ".asm",
+        cross_references([parse_word_as_token(word) for word in lex_file(in_filename)])
+    )
     call_cmd(["fasm", base_name + ".asm"])
     call_cmd(["mv", base_name, out_filename], echo=False)
 

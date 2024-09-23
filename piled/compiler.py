@@ -60,7 +60,7 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     buf.body("")
     buf.config("entry _start")
     buf.label("_start")
-    assert len(TokenType) == 5, "Exhaustive handling of TokenType in compilation"
+    assert len(TokenType) == 7, "Exhaustive handling of TokenType in compilation"
     while ip < tokens_count:
         token = tokens[ip]
         if token.type == TokenType.PUSH_INT:
@@ -83,6 +83,13 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("cmp rax, rbx")
             buf.body("cmove rcx, rdx")
             buf.body("push rcx")
+        elif token.type == TokenType.IF:
+            buf.body("pop rax")
+            buf.body("test rax, rax")
+            assert token.value is not None, "please call cross_references() before calling generate_assembly()"
+            buf.body("jz _label_%d" % token.value)
+        elif token.type == TokenType.ENDIF:
+            buf.label("_label_%d" % ip)
         elif token.type == TokenType.PRINT:
             buf.body("pop rdi")
             buf.body("call print")

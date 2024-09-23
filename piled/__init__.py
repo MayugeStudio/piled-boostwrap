@@ -1,5 +1,5 @@
 from .compiler import generate_assembly
 from .lexer import lex_file
-from .parser import parse_word_as_token
+from .parser import parse_word_as_token, cross_references
 
-__all__ = ["lex_file", "parse_word_as_token", "generate_assembly"]
+__all__ = ["lex_file", "parse_word_as_token", "cross_references", "generate_assembly"]
