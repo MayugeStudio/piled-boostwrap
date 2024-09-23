@@ -1,6 +1,9 @@
+import typing as tt
 from io import StringIO
 
-from piled.common import Token, TokenType
+from piled.common import Token
+from piled.common import TokenType
+
 
 class AsmWriter(StringIO):
     def write(self, s: str) -> int:
@@ -12,8 +15,12 @@ class AsmWriter(StringIO):
     def comment(self, s: str) -> None:
         self.write(";" + s)
 
-    def label(self, label_name: str) -> None:
-        self.write("\n" + label_name + ":")
+    def label(self, label_name: str, label_comment: tt.Optional[str] = None) -> None:
+        if label_comment is not None:
+            self.write("\n; ######## " + label_name + " ########")
+            self.write(label_name + ":")
+        else:
+            self.write("\n" + label_name + ":")
 
     def body(self, s: str) -> None:
         self.write("    " + s)
@@ -64,18 +71,22 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     while ip < tokens_count:
         token = tokens[ip]
         if token.type == TokenType.PUSH_INT:
+            buf.body("; #### push int ####")
             buf.body("push %d" % (token.value,))
         elif token.type == TokenType.PLUS:
+            buf.body("; #### plus ####")
             buf.body("pop rax")
             buf.body("pop rbx")
             buf.body("add rax, rbx")
             buf.body("push rax")
         elif token.type == TokenType.MINUS:
+            buf.body("; #### minus ####")
             buf.body("pop rax")
             buf.body("pop rbx")
             buf.body("sub rbx, rax")
             buf.body("push rbx")
         elif token.type == TokenType.EQUAL:
+            buf.body("; #### equal ####")
             buf.body("mov rcx, 0")
             buf.body("mov rdx, 1")
             buf.body("pop rax")
@@ -85,15 +96,17 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("push rcx")
         # NOTE: To optimize time, we may be able to remove `if` token before compiling.
         elif token.type == TokenType.IF:
-            pass
+            buf.body("; #### if ####")
         elif token.type == TokenType.THEN:
             assert token.value is not None, "please call cross_references() before calling generate_assembly()"
+            buf.body("; #### then ####")
             buf.body("pop rax")
             buf.body("test rax, rax")
-            buf.body("jz _label_%d" % token.value)
+            buf.body("jz _label_endif_%d" % token.value)
         elif token.type == TokenType.ENDIF:
-            buf.label("_label_%d" % ip)
+            buf.label("_label_endif_%d" % ip, label_comment="endif")
         elif token.type == TokenType.PRINT:
+            buf.body("; #### print ####")
             buf.body("pop rdi")
             buf.body("call print")
         else:
