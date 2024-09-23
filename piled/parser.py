@@ -10,7 +10,7 @@ token_literal_bindings: dict[str, TokenType] = {
     "="    : TokenType.EQUAL,
     "if"   : TokenType.IF,
     "then" : TokenType.THEN,
-    "endif": TokenType.ENDIF,
+    "end"  : TokenType.END,
     "print": TokenType.PRINT,
 }
 
@@ -45,10 +45,10 @@ def cross_references(program: list[Token]) -> list[Token]:
             pass
         elif program[addr].type == TokenType.THEN:
             stack.append(addr)
-        elif program[addr].type == TokenType.ENDIF:
+        elif program[addr].type == TokenType.END:
             then_addr = stack.pop()
             assert program[then_addr].type == TokenType.THEN, \
-                "The token `endif` can only close `if` block. but %s is found." % program[then_addr].type.name
+                "The token `end` can only close `if` block. but %s is found." % program[then_addr].type.name
             program[then_addr].value = addr
 
         addr += 1

@@ -1,6 +1,7 @@
 import typing as tt
 from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
+from enum import auto
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,7 +24,7 @@ class TokenType(Enum):
     EQUAL = auto()
     IF = auto()
     THEN = auto()
-    ENDIF = auto()
+    END = auto()
     PRINT = auto()
 
 

@@ -102,9 +102,9 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("; #### then ####")
             buf.body("pop rax")
             buf.body("test rax, rax")
-            buf.body("jz _label_endif_%d" % token.value)
-        elif token.type == TokenType.ENDIF:
-            buf.label("_label_endif_%d" % ip, label_comment="endif")
+            buf.body("jz _label_end_%d" % token.value)
+        elif token.type == TokenType.END:
+            buf.label("_label_end_%d" % ip, label_comment="end")
         elif token.type == TokenType.PRINT:
             buf.body("; #### print ####")
             buf.body("pop rdi")
