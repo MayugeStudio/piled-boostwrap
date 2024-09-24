@@ -19,6 +19,7 @@ def lex_line(line: str) -> tt.Generator[tuple[int, str], None, None]:
         col = find_col(line, col_end, lambda x: not x.isspace())
 
 
+# TODO lex_file does not support any style of comment.
 def lex_file(file_path: str) -> list[Word]:
     with open(file_path) as f:
         return [
