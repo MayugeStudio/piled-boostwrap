@@ -1,0 +1,17 @@
+1 1 +
+if 2 = then
+  1 print
+else
+  0 print
+end
+
+69 print
+
+1 1 +
+if 99 = then
+  1 print
+else
+  0 print
+end
+
+420 print

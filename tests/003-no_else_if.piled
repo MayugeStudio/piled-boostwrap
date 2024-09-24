@@ -1,0 +1,5 @@
+1 1 + if 2 = then
+  1 print
+end
+
+69 print

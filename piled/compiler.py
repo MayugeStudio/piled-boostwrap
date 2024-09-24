@@ -15,12 +15,8 @@ class AsmWriter(StringIO):
     def comment(self, s: str) -> None:
         self.write(";" + s)
 
-    def label(self, label_name: str, label_comment: tt.Optional[str] = None) -> None:
-        if label_comment is not None:
-            self.write("\n; ######## " + label_comment + " ########")
-            self.write(label_name + ":")
-        else:
-            self.write("\n" + label_name + ":")
+    def label(self, label_name: str) -> None:
+        self.write(label_name + ":")
 
     def body(self, s: str) -> None:
         self.write("    " + s)
@@ -67,9 +63,10 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     buf.body("")
     buf.config("entry _start")
     buf.label("_start")
-    assert len(TokenType) == 9, "Exhaustive handling of TokenType in compilation"
+    assert len(TokenType) == 13, "Exhaustive handling of TokenType in compilation"
     while ip < tokens_count:
         token = tokens[ip]
+        buf.label("_label_%d" % (ip,))
         if token.type == TokenType.PUSH_INT:
             buf.body("; #### push int ####")
             buf.body("push %d" % (token.value,))
@@ -94,6 +91,15 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("cmp rax, rbx")
             buf.body("cmove rcx, rdx")
             buf.body("push rcx")
+        elif token.type == TokenType.GT:
+            buf.body("; #### gt ####")
+            buf.body("mov rcx, 0")
+            buf.body("mov rdx, 1")
+            buf.body("pop rbx")
+            buf.body("pop rax")
+            buf.body("cmp rax, rbx")
+            buf.body("cmovg rcx, rdx")
+            buf.body("push rcx")
         # NOTE: To optimize time, we may be able to remove `if` token before compiling.
         elif token.type == TokenType.IF:
             buf.body("; #### if ####")
@@ -106,9 +112,25 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
         elif token.type == TokenType.ELSE:
             assert token.value is not None, "please call cross_references() before calling generate_assembly()"
             buf.body("jmp _label_%d" % token.value)
-            buf.label("_label_%d" % (ip + 1,), label_comment="else")
+        # NOTE: To optimize time, we may be able to remove `while` token before compiling.
+        elif token.type == TokenType.WHILE:
+            buf.body("; #### while ####")
+        elif token.type == TokenType.DO:
+            assert token.value is not None, "please call cross_references() before calling generate_assembly()"
+            buf.body("; #### do ####")
+            buf.body("pop rax")
+            buf.body("test rax, rax")
+            buf.body("jz _label_%d" % token.value)
         elif token.type == TokenType.END:
-            buf.label("_label_%d" % ip, label_comment="end")
+            assert token.value is not None, "please call cross_references() before calling generate_assembly()"
+            buf.body("; #### end ####")
+            if token.value != ip + 1:
+                buf.body("jmp _label_%d" % token.value)
+        elif token.type == TokenType.DUP:
+            buf.body("; #### dup ####")
+            buf.body("pop rax")
+            buf.body("push rax")
+            buf.body("push rax")
         elif token.type == TokenType.PRINT:
             buf.body("; #### print ####")
             buf.body("pop rdi")

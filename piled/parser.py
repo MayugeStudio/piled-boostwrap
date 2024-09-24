@@ -3,15 +3,19 @@ from piled.common import Token
 from piled.common import TokenType
 from piled.common import Word
 
-assert len(TokenType) == 9, "Exhaustive handling of TokenKind in bindings of parser"
+assert len(TokenType) == 13, "Exhaustive handling of TokenKind in bindings of parser"
 token_literal_bindings: dict[str, TokenType] = {
     "+"    : TokenType.PLUS,
     "-"    : TokenType.MINUS,
     "="    : TokenType.EQUAL,
+    ">"    : TokenType.GT,
     "if"   : TokenType.IF,
     "then" : TokenType.THEN,
     "else" : TokenType.ELSE,
+    "while": TokenType.WHILE,
+    "do"   : TokenType.DO,
     "end"  : TokenType.END,
+    "dup"  : TokenType.DUP,
     "print": TokenType.PRINT,
 }
 
@@ -37,7 +41,7 @@ def cross_references(program: list[Token]) -> list[Token]:
     addr = 0
     stack: list[int] = []
     program_length = len(program)
-    assert len(TokenType) == 9, \
+    assert len(TokenType) == 13, \
         "Exhaustive handling of TokenType in cross_reference. \n \
          Note that not all of tokens need to be handled in here.\n \
          Only those that form blocks."
@@ -53,13 +57,24 @@ def cross_references(program: list[Token]) -> list[Token]:
                  but `%s` is found." % program[then_addr].type.name
             program[then_addr].value = addr + 1
             stack.append(addr)
+        elif program[addr].type == TokenType.WHILE:
+            stack.append(addr)
+        elif program[addr].type == TokenType.DO:
+            while_ip = stack.pop()
+            program[addr].value = while_ip
+            stack.append(addr)
         elif program[addr].type == TokenType.END:
             block_addr = stack.pop()
-            assert program[block_addr].type == TokenType.THEN or program[block_addr].type == TokenType.ELSE, \
+            assert program[block_addr].type in (TokenType.THEN, TokenType.ELSE, TokenType.DO), \
                 "The token `end` can only use to close blocks. but `%s` is found." % program[block_addr].type.name
 
             if program[block_addr].type == TokenType.THEN or program[block_addr].type == TokenType.ELSE:
                 program[block_addr].value = addr
+                program[addr].value = addr + 1
+            elif program[block_addr].type == TokenType.DO:
+                assert program[block_addr].value is not None
+                program[addr].value = program[block_addr].value
+                program[block_addr].value = addr + 1
             else:
                 assert False, "unreachable"
 

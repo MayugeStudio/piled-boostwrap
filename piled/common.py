@@ -22,10 +22,14 @@ class TokenType(Enum):
     PLUS = auto()
     MINUS = auto()
     EQUAL = auto()
+    GT = auto()
     IF = auto()
     THEN = auto()
     ELSE = auto()
+    WHILE = auto()
+    DO = auto()
     END = auto()
+    DUP = auto()
     PRINT = auto()
 
 
