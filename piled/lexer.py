@@ -20,6 +20,7 @@ def lex_line(line: str) -> tt.Generator[tuple[int, str], None, None]:
 
 
 # TODO lex_file does not support any style of comment.
+# TODO lex_file does not catch FileNotFoundError.
 def lex_file(file_path: str) -> list[Word]:
     with open(file_path) as f:
         return [
