@@ -49,13 +49,14 @@ def cross_references(program: list[Token]) -> list[Token]:
         elif program[addr].type == TokenType.ELSE:
             then_addr = stack.pop()
             assert program[then_addr].type == TokenType.THEN, \
-                "The token `else` can only be used in `if-else` block. but `%s` is found." % program[then_addr].type.name
+                "The token `else` can only be used in `if-else` block.\
+                 but `%s` is found." % program[then_addr].type.name
             program[then_addr].value = addr + 1
             stack.append(addr)
         elif program[addr].type == TokenType.END:
             block_addr = stack.pop()
             assert program[block_addr].type == TokenType.THEN or program[block_addr].type == TokenType.ELSE, \
-                "The token `end` can only use to close blocks. but %s is found." % program[block_addr].type.name
+                "The token `end` can only use to close blocks. but `%s` is found." % program[block_addr].type.name
 
             if program[block_addr].type == TokenType.THEN or program[block_addr].type == TokenType.ELSE:
                 program[block_addr].value = addr
