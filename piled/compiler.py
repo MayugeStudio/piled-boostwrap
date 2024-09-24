@@ -63,7 +63,7 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     buf.body("")
     buf.config("entry _start")
     buf.label("_start")
-    assert len(TokenType) == 13, "Exhaustive handling of TokenType in compilation"
+    assert len(TokenType) == 16, "Exhaustive handling of TokenType in compilation"
     while ip < tokens_count:
         token = tokens[ip]
         buf.label("_label_%d" % (ip,))
@@ -95,10 +95,37 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("; #### gt ####")
             buf.body("mov rcx, 0")
             buf.body("mov rdx, 1")
-            buf.body("pop rbx")
             buf.body("pop rax")
-            buf.body("cmp rax, rbx")
+            buf.body("pop rbx")
+            buf.body("cmp rbx, rax")
             buf.body("cmovg rcx, rdx")
+            buf.body("push rcx")
+        elif token.type == TokenType.LT:
+            buf.body("; #### lt ####")
+            buf.body("mov rcx, 0")
+            buf.body("mov rdx, 1")
+            buf.body("pop rax")
+            buf.body("pop rbx")
+            buf.body("cmp rbx, rax")
+            buf.body("cmovl rcx, rdx")
+            buf.body("push rcx")
+        elif token.type == TokenType.GE:
+            buf.body("; #### ge ####")
+            buf.body("mov rcx, 0")
+            buf.body("mov rdx, 1")
+            buf.body("pop rax")
+            buf.body("pop rbx")
+            buf.body("cmp rbx, rax")
+            buf.body("cmovge rcx, rdx")
+            buf.body("push rcx")
+        elif token.type == TokenType.LE:
+            buf.body("; #### le ####")
+            buf.body("mov rcx, 0")
+            buf.body("mov rdx, 1")
+            buf.body("pop rax")
+            buf.body("pop rbx")
+            buf.body("cmp rbx, rax")
+            buf.body("cmovle rcx, rdx")
             buf.body("push rcx")
         # NOTE: To optimize time, we may be able to remove `if` token before compiling.
         elif token.type == TokenType.IF:

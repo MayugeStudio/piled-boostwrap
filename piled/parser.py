@@ -3,12 +3,15 @@ from piled.common import Token
 from piled.common import TokenType
 from piled.common import Word
 
-assert len(TokenType) == 13, "Exhaustive handling of TokenKind in bindings of parser"
+assert len(TokenType) == 16, "Exhaustive handling of TokenKind in bindings of parser"
 token_literal_bindings: dict[str, TokenType] = {
     "+"    : TokenType.PLUS,
     "-"    : TokenType.MINUS,
     "="    : TokenType.EQUAL,
     ">"    : TokenType.GT,
+    "<"    : TokenType.LT,
+    ">="    : TokenType.GE,
+    "<="    : TokenType.LE,
     "if"   : TokenType.IF,
     "then" : TokenType.THEN,
     "else" : TokenType.ELSE,
@@ -41,7 +44,7 @@ def cross_references(program: list[Token]) -> list[Token]:
     addr = 0
     stack: list[int] = []
     program_length = len(program)
-    assert len(TokenType) == 13, \
+    assert len(TokenType) == 16, \
         "Exhaustive handling of TokenType in cross_reference. \n \
          Note that not all of tokens need to be handled in here.\n \
          Only those that form blocks."

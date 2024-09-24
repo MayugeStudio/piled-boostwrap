@@ -1,0 +1,25 @@
+2 if 1 > then
+  1 print
+else
+  0 print
+end
+
+1 if 2 < then
+  1 print
+else
+  0 print
+end
+
+2 if 2 >= then
+  1 print
+else
+  0 print
+end
+
+2 if 2 <= then
+  1 print
+else
+  0 print
+end
+
+420 print
