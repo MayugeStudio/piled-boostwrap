@@ -1,5 +1,5 @@
 1 1 +
-if 2 = then
+2 = if
   1 print
 else
   0 print
@@ -8,7 +8,7 @@ end
 69 print
 
 1 1 +
-if 99 = then
+99 = if
   1 print
 else
   0 print

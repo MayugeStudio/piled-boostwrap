@@ -1,4 +1,3 @@
-import typing as tt
 from io import StringIO
 
 from piled.common import Token
@@ -64,7 +63,7 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     buf.body("")
     buf.config("entry _start")
     buf.label("_start")
-    assert len(TokenType) == 20, "Exhaustive handling of TokenType in compilation"
+    assert len(TokenType) == 19, "Exhaustive handling of TokenType in compilation"
     while ip < tokens_count:
         token = tokens[ip]
         buf.label("_label_%d" % (ip,))
@@ -128,12 +127,9 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("cmp rbx, rax")
             buf.body("cmovle rcx, rdx")
             buf.body("push rcx")
-        # NOTE: To optimize time, we may be able to remove `if` token before compiling.
         elif token.type == TokenType.IF:
-            buf.body("; #### if ####")
-        elif token.type == TokenType.THEN:
             assert token.value is not None, "please call cross_references() before calling generate_assembly()"
-            buf.body("; #### then ####")
+            buf.body("; #### if ####")
             buf.body("pop rax")
             buf.body("test rax, rax")
             buf.body("jz _label_%d" % token.value)

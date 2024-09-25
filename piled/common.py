@@ -27,7 +27,6 @@ class TokenType(Enum):
     GE = auto()
     LE = auto()
     IF = auto()
-    THEN = auto()
     ELSE = auto()
     WHILE = auto()
     DO = auto()
