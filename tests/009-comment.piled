@@ -1,0 +1,6 @@
+memory 0 + 97 ! // a
+memory 1 + 98 ! // b
+memory 2 + 99 ! // c
+memory 3 + 10 ! // \n
+
+4 memory 1 1 syscall3
