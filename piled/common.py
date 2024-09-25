@@ -34,6 +34,10 @@ class TokenType(Enum):
     END = auto()
     DUP = auto()
     PRINT = auto()
+    MEMORY = auto()
+    LOAD = auto()
+    STORE = auto()
+    SYSCALL3 = auto()
 
 
 @dataclass(slots=True)

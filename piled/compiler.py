@@ -29,6 +29,7 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
 
     # Write Header
     buf.config("format ELF64 executable 3")
+    buf.config("segment readable executable")
 
     buf.label("print")
     buf.body("mov r8, -3689348814741910323")
@@ -63,7 +64,7 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
     buf.body("")
     buf.config("entry _start")
     buf.label("_start")
-    assert len(TokenType) == 16, "Exhaustive handling of TokenType in compilation"
+    assert len(TokenType) == 20, "Exhaustive handling of TokenType in compilation"
     while ip < tokens_count:
         token = tokens[ip]
         buf.label("_label_%d" % (ip,))
@@ -162,14 +163,39 @@ def generate_assembly(filepath: str, tokens: list[Token]) -> None:
             buf.body("; #### print ####")
             buf.body("pop rdi")
             buf.body("call print")
+        elif token.type == TokenType.MEMORY:
+            buf.body("; #### memory ####")
+            buf.body("push memory")
+        elif token.type == TokenType.LOAD:
+            buf.body("; #### load ####")
+            buf.body("pop rax")
+            buf.body("xor rbx, rbx")
+            buf.body("mov bl, [rax]")
+            buf.body("push rbx")
+        elif token.type == TokenType.STORE:
+            buf.body("; #### store ####")
+            buf.body("pop rbx")
+            buf.body("pop rax")
+            buf.body("mov [rax], bl")
+        elif token.type == TokenType.SYSCALL3:
+            buf.body("; #### syscall3 ####")
+            buf.body("pop rax")
+            buf.body("pop rdi")
+            buf.body("pop rsi")
+            buf.body("pop rdx")
+            buf.body("syscall")
         else:
             assert "unreachable"
 
         ip += 1
     # exit with 0
+    buf.label("_label_%d" % (len(tokens),))
     buf.body("mov rax, 60")
     buf.body("mov rdi, 0")
     buf.body("syscall")
+
+    buf.config("segment readable writable")
+    buf.config("memory rb 640000")
 
     with open(filepath, "w") as f:
         f.write(buf.getvalue())

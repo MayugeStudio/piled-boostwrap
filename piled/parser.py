@@ -3,7 +3,7 @@ from piled.common import Token
 from piled.common import TokenType
 from piled.common import Word
 
-assert len(TokenType) == 16, "Exhaustive handling of TokenKind in bindings of parser"
+assert len(TokenType) == 20, "Exhaustive handling of TokenKind in bindings of parser"
 token_literal_bindings: dict[str, TokenType] = {
     "+"    : TokenType.PLUS,
     "-"    : TokenType.MINUS,
@@ -20,6 +20,10 @@ token_literal_bindings: dict[str, TokenType] = {
     "end"  : TokenType.END,
     "dup"  : TokenType.DUP,
     "print": TokenType.PRINT,
+    "memory": TokenType.MEMORY,
+    "@": TokenType.LOAD,
+    "!": TokenType.STORE,
+    "syscall3" : TokenType.SYSCALL3,
 }
 
 
@@ -44,7 +48,7 @@ def cross_references(program: list[Token]) -> list[Token]:
     addr = 0
     stack: list[int] = []
     program_length = len(program)
-    assert len(TokenType) == 16, \
+    assert len(TokenType) == 20, \
         "Exhaustive handling of TokenType in cross_reference. \n \
          Note that not all of tokens need to be handled in here.\n \
          Only those that form blocks."
