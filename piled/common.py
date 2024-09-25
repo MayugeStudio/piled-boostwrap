@@ -27,13 +27,16 @@ class TokenType(Enum):
     GE = auto()
     LE = auto()
     IF = auto()
-    THEN = auto()
     ELSE = auto()
     WHILE = auto()
     DO = auto()
     END = auto()
     DUP = auto()
     PRINT = auto()
+    MEMORY = auto()
+    LOAD = auto()
+    STORE = auto()
+    SYSCALL3 = auto()
 
 
 @dataclass(slots=True)

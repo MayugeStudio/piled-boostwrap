@@ -3,7 +3,7 @@ from piled.common import Token
 from piled.common import TokenType
 from piled.common import Word
 
-assert len(TokenType) == 16, "Exhaustive handling of TokenKind in bindings of parser"
+assert len(TokenType) == 19, "Exhaustive handling of TokenKind in bindings of parser"
 token_literal_bindings: dict[str, TokenType] = {
     "+"    : TokenType.PLUS,
     "-"    : TokenType.MINUS,
@@ -13,13 +13,16 @@ token_literal_bindings: dict[str, TokenType] = {
     ">="    : TokenType.GE,
     "<="    : TokenType.LE,
     "if"   : TokenType.IF,
-    "then" : TokenType.THEN,
     "else" : TokenType.ELSE,
     "while": TokenType.WHILE,
     "do"   : TokenType.DO,
     "end"  : TokenType.END,
     "dup"  : TokenType.DUP,
     "print": TokenType.PRINT,
+    "memory": TokenType.MEMORY,
+    "@": TokenType.LOAD,
+    "!": TokenType.STORE,
+    "syscall3" : TokenType.SYSCALL3,
 }
 
 
@@ -44,21 +47,19 @@ def cross_references(program: list[Token]) -> list[Token]:
     addr = 0
     stack: list[int] = []
     program_length = len(program)
-    assert len(TokenType) == 16, \
+    assert len(TokenType) == 19, \
         "Exhaustive handling of TokenType in cross_reference. \n \
          Note that not all of tokens need to be handled in here.\n \
          Only those that form blocks."
     while addr < program_length:
         if program[addr].type == TokenType.IF:
-            pass
-        elif program[addr].type == TokenType.THEN:
             stack.append(addr)
         elif program[addr].type == TokenType.ELSE:
-            then_addr = stack.pop()
-            assert program[then_addr].type == TokenType.THEN, \
+            if_addr = stack.pop()
+            assert program[if_addr].type == TokenType.IF, \
                 "The token `else` can only be used in `if-else` block.\
-                 but `%s` is found." % program[then_addr].type.name
-            program[then_addr].value = addr + 1
+                 but `%s` is found." % program[if_addr].type.name
+            program[if_addr].value = addr + 1
             stack.append(addr)
         elif program[addr].type == TokenType.WHILE:
             stack.append(addr)
@@ -68,10 +69,9 @@ def cross_references(program: list[Token]) -> list[Token]:
             stack.append(addr)
         elif program[addr].type == TokenType.END:
             block_addr = stack.pop()
-            assert program[block_addr].type in (TokenType.THEN, TokenType.ELSE, TokenType.DO), \
+            assert program[block_addr].type in (TokenType.IF, TokenType.ELSE, TokenType.DO), \
                 "The token `end` can only use to close blocks. but `%s` is found." % program[block_addr].type.name
-
-            if program[block_addr].type == TokenType.THEN or program[block_addr].type == TokenType.ELSE:
+            if program[block_addr].type == TokenType.IF or program[block_addr].type == TokenType.ELSE:
                 program[block_addr].value = addr
                 program[addr].value = addr + 1
             elif program[block_addr].type == TokenType.DO:
