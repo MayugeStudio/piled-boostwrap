@@ -25,7 +25,7 @@ token_literal_bindings: dict[str, TokenType] = {
 }
 
 
-def parser_report_error(word: Word, message: str, with_exit=True) -> None:
+def report_error(word: Word, message: str, with_exit=True) -> None:
     print("%s:%d:%d: %s" % (word.filepath, word.location.row, word.location.col, message))
     if with_exit:
         exit(1)
@@ -39,7 +39,7 @@ def parse_word_as_token(word: Word) -> Token:
             value = int(word.value)
             return Token(word.filepath, word.location, TokenType.PUSH_INT, value=value)
         except ValueError:
-            parser_report_error(word, "unknown value `%s`" % (word.value,))
+            report_error(word, "unknown value `%s`" % (word.value,))
 
 
 def cross_references(program: list[Token]) -> list[Token]:
