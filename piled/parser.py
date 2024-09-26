@@ -1,3 +1,6 @@
+import sys
+
+from piled.common import Location
 from piled.common import Token
 from piled.common import TokenType
 from piled.common import Word
@@ -25,8 +28,8 @@ token_literal_bindings: dict[str, TokenType] = {
 }
 
 
-def report_error(word: Word, message: str, with_exit=True) -> None:
-    print("%s:%d:%d: %s" % (word.filepath, word.location.row, word.location.col, message))
+def report_error(filepath: str, loc: Location, message: str, with_exit=True) -> None:
+    print("%s:%d:%d: %s" % (filepath, loc.row, loc.col, message), file=sys.stderr)
     if with_exit:
         exit(1)
 
@@ -39,25 +42,23 @@ def parse_word_as_token(word: Word) -> Token:
             value = int(word.value)
             return Token(word.filepath, word.location, TokenType.PUSH_INT, value=value)
         except ValueError:
-            report_error(word, "unknown value `%s`" % (word.value,))
+            report_error(word.filepath, word.location, "unknown value `%s`" % (word.value,))
 
 
 def cross_references(program: list[Token]) -> list[Token]:
     addr = 0
     stack: list[int] = []
     program_length = len(program)
-    assert len(TokenType) == 19, \
-        "Exhaustive handling of TokenType in cross_reference. \n \
-         Note that not all of tokens need to be handled in here.\n \
-         Only those that form blocks."
+    assert len(TokenType) == 19, "Exhaustive handling of TokenType in cross_reference. \n"
     while addr < program_length:
         if program[addr].type == TokenType.IF:
             stack.append(addr)
         elif program[addr].type == TokenType.ELSE:
             if_addr = stack.pop()
-            assert program[if_addr].type == TokenType.IF, \
-                "The token `else` can only be used in `if-else` block.\
-                 but `%s` is found." % program[if_addr].type.name
+            if program[if_addr].type != TokenType.IF:
+                report_error(program[if_addr].filepath, program[if_addr].location,
+                             "The token `else` can only be used in `if-else` block. \
+                             but `%s` is found." % program[if_addr].type.name)
             program[if_addr].value = addr + 1
             stack.append(addr)
         elif program[addr].type == TokenType.WHILE:
@@ -68,13 +69,17 @@ def cross_references(program: list[Token]) -> list[Token]:
             stack.append(addr)
         elif program[addr].type == TokenType.END:
             block_addr = stack.pop()
-            assert program[block_addr].type in (TokenType.IF, TokenType.ELSE, TokenType.DO), \
-                "The token `end` can only use to close blocks. but `%s` is found." % program[block_addr].type.name
+            if program[block_addr].type in (TokenType.IF, TokenType.ELSE, TokenType.DO):
+                report_error(program[block_addr].filepath, program[block_addr].location,
+                             "The token `end` can only use to close blocks. \
+                             but `%s` is found." % program[block_addr].type.name)
             if program[block_addr].type == TokenType.IF or program[block_addr].type == TokenType.ELSE:
                 program[block_addr].value = addr
                 program[addr].value = addr + 1
             elif program[block_addr].type == TokenType.DO:
-                assert program[block_addr].value is not None
+                if program[block_addr].value is None:
+                    report_error(program[block_addr].filepath, program[block_addr].location,
+                                 "`do` can use with `while`.")
                 program[addr].value = program[block_addr].value
                 program[block_addr].value = addr + 1
             else:
