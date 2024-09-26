@@ -45,7 +45,3 @@ class Token:
     location: Location
     type: TokenType
     value: tt.Optional[int] = None
-
-
-class ErrorType(Enum):
-    UnknownTokenError = "UnknownTokenError"

@@ -1,4 +1,3 @@
-from piled.common import ErrorType
 from piled.common import Token
 from piled.common import TokenType
 from piled.common import Word
@@ -26,8 +25,8 @@ token_literal_bindings: dict[str, TokenType] = {
 }
 
 
-def parser_report_error(word: Word, err_type: ErrorType, message: str, with_exit=True) -> None:
-    print("%s:%d:%d: %s: %s" % (word.filepath, word.location.row, word.location.col, str(err_type.value), message))
+def parser_report_error(word: Word, message: str, with_exit=True) -> None:
+    print("%s:%d:%d: %s" % (word.filepath, word.location.row, word.location.col, message))
     if with_exit:
         exit(1)
 
@@ -40,7 +39,7 @@ def parse_word_as_token(word: Word) -> Token:
             value = int(word.value)
             return Token(word.filepath, word.location, TokenType.PUSH_INT, value=value)
         except ValueError:
-            parser_report_error(word, ErrorType.UnknownTokenError, "unknown value `%s`" % (word.value,))
+            parser_report_error(word, "unknown value `%s`" % (word.value,))
 
 
 def cross_references(program: list[Token]) -> list[Token]:
