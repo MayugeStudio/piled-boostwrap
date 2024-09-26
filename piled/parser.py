@@ -36,13 +36,13 @@ def report_error(filepath: str, loc: Location, message: str, with_exit=True) -> 
 
 def parse_word_as_token(word: Word) -> Token:
     if word.value in token_literal_bindings.keys():
-        return Token(word.filepath, word.location, token_literal_bindings[word.value])
+        return Token(word.filepath, word.loc, token_literal_bindings[word.value])
     else:
         try:
             value = int(word.value)
-            return Token(word.filepath, word.location, TokenType.PUSH_INT, value=value)
+            return Token(word.filepath, word.loc, TokenType.PUSH_INT, value=value)
         except ValueError:
-            report_error(word.filepath, word.location, "unknown value `%s`" % (word.value,))
+            report_error(word.filepath, word.loc, "unknown value `%s`" % (word.value,))
 
 
 def cross_references(program: list[Token]) -> list[Token]:
@@ -56,7 +56,7 @@ def cross_references(program: list[Token]) -> list[Token]:
         elif program[addr].type == TokenType.ELSE:
             if_addr = stack.pop()
             if program[if_addr].type != TokenType.IF:
-                report_error(program[if_addr].filepath, program[if_addr].location,
+                report_error(program[if_addr].filepath, program[if_addr].loc,
                              "The token `else` can only be used in `if-else` block. \
                              but `%s` is found." % program[if_addr].type.name)
             program[if_addr].value = addr + 1
@@ -70,7 +70,7 @@ def cross_references(program: list[Token]) -> list[Token]:
         elif program[addr].type == TokenType.END:
             block_addr = stack.pop()
             if program[block_addr].type in (TokenType.IF, TokenType.ELSE, TokenType.DO):
-                report_error(program[block_addr].filepath, program[block_addr].location,
+                report_error(program[block_addr].filepath, program[block_addr].loc,
                              "The token `end` can only use to close blocks. \
                              but `%s` is found." % program[block_addr].type.name)
             if program[block_addr].type == TokenType.IF or program[block_addr].type == TokenType.ELSE:
@@ -78,7 +78,7 @@ def cross_references(program: list[Token]) -> list[Token]:
                 program[addr].value = addr + 1
             elif program[block_addr].type == TokenType.DO:
                 if program[block_addr].value is None:
-                    report_error(program[block_addr].filepath, program[block_addr].location,
+                    report_error(program[block_addr].filepath, program[block_addr].loc,
                                  "`do` can use with `while`.")
                 program[addr].value = program[block_addr].value
                 program[block_addr].value = addr + 1

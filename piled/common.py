@@ -13,7 +13,7 @@ class Location:
 @dataclass(slots=True)
 class Word:
     filepath: str
-    location: Location
+    loc: Location
     value: str
 
 
@@ -42,6 +42,6 @@ class TokenType(Enum):
 @dataclass(slots=True)
 class Token:
     filepath: str
-    location: Location
+    loc: Location
     type: TokenType
     value: tt.Optional[int] = None
