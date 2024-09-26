@@ -10,6 +10,7 @@ from piled import lex_file
 from piled import parse_word_as_token
 
 
+# TODO: call_cmd doesn't handle any type of error
 def call_cmd(args: list[str], echo=True, capture=True) -> None:
     if echo:
         print("[CMD] " + " ".join(args))
